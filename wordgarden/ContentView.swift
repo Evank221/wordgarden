@@ -17,6 +17,8 @@ struct ContentView: View {
     @State private var guessedLetter = ""
     @State private var imageName = "flower8"
     @State private var playAgainHidden = true
+    @FocusState private var textfieldisfocus: Bool
+    
     var body: some View {
         VStack {
             HStack {
@@ -50,14 +52,29 @@ struct ContentView: View {
                         .overlay {
                             RoundedRectangle(cornerRadius: 5)
                                 .stroke(.gray, lineWidth: 2)
+                            
                         }
+                        .keyboardType(.asciiCapable)
+                        .submitLabel(.done)
+                        .autocorrectionDisabled()
+                        .textInputAutocapitalization(.characters)
+                        .onChange(of: guessedLetter) {
+                            guessedLetter =
+                            guessedLetter.trimmingCharacters(in: .letters.inverted)
+                            guard let lastchar = guessedLetter.last else{
+                                return
+                            }
+                            guessedLetter = String(lastchar).uppercased()
+                        }
+                        .focused($textfieldisfocus)
                     
                     Button("guess a letter:"){
                         //TODO: guess a letter
-                        playAgainHidden = false
+                        textfieldisfocus = false
                     }
                     .buttonStyle(.bordered)
                     .tint(.mint)
+                    .disabled(guessedLetter.isEmpty)
                 }
             } else {
                 Button("another word?"){
